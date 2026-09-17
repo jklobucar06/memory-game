@@ -1,0 +1,21 @@
+interface CardProps {
+    card: CardType,
+    onClick: (card: CardType) => void,
+}
+export type CardType = {
+  id: number,
+  value: string,
+  isFlipped: boolean,
+  isMatched: boolean,
+}
+
+const Card = ({card, onClick}: CardProps) => {
+  return (
+    <div className={`card ${card.isFlipped ? "flipped": ""} ${card.isMatched ? "matched" : ""}`} onClick={() => onClick(card)}>
+        <div className="card-front">?</div>
+        <div className="card-back">{card.value}</div>
+    </div>
+  )
+}
+
+export default Card
