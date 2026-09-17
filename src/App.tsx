@@ -10,7 +10,6 @@ const CARD_VALUES = ["🍎", "🍌", "🍇", "🍊", "🍓", "🥝", "🍑", "�
 const App = () => {
   const [cards, setCards] = useState<CardType[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [matchedCards, setMatchedCards] = useState<number[]>([]);
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [hasWon, setHasWon] = useState<boolean>(false);
@@ -18,13 +17,8 @@ const App = () => {
   const initializeGame = () => {
     setHasWon(false);
     setFlippedCards([]);
-          const flippedBackCards = cards.map(c => {
-            return {...c, isFlipped: false, isMatched: false};
-          });
-    setCards(flippedBackCards);
     setScore(0);
     setMoves(0);
-    setMatchedCards([]);
     const shuffledCards = shuffleCards();
 
     const finalCards = shuffledCards.map((value, index) => ({
@@ -57,7 +51,7 @@ const App = () => {
   }
 
   const handleCardClick = (card: CardType) => {
-    if(flippedCards.length === 2 || card.isFlipped || card.isMatched) return;
+    if(flippedCards.length === 2 || card.isFlipped || card.isMatched || hasWon) return;
 
     const newCards = cards.map((c) => {
       if(c.id === card.id) return {...c, isFlipped: true};
@@ -74,7 +68,6 @@ const App = () => {
 
       if(firstCard.value === card.value) {
         setTimeout(() => {
-          setMatchedCards(c => [...c, firstCard.id, card.id]);
           const newMatchedCards = newCards.map(c => {
           if(c.id === card.id || c.id === firstCard.id) 
               return {...c, isMatched: true};
@@ -86,6 +79,12 @@ const App = () => {
           setScore(s => s + 1);
           setMoves(m => m + 1);
         }, 600);
+
+        if(score + 1 === CARD_VALUES.length / 2) {
+        setTimeout(() => {
+          setHasWon(true);
+        }, 1500);
+       }; 
 
       } else {
 
@@ -102,12 +101,7 @@ const App = () => {
           setMoves(m => m + 1);
         }, 600);
         
-      }  
-       if(score + 1 === CARD_VALUES.length / 2) {
-        setTimeout(() => {
-          setHasWon(true);
-        }, 1500);
-       };      
+      }       
     }
   }
 
@@ -128,7 +122,7 @@ const App = () => {
       <GameHeader score={score} moves={moves}/>
       <div className="cards-grid">
         {cards.map((card) => (
-          <Card card={card} onClick={() => handleCardClick(card)}/>
+          <Card key={card.id} card={card} onClick={() => handleCardClick(card)}/>
         ))}
       </div>
 
